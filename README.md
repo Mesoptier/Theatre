@@ -10,27 +10,29 @@ Small dependency injection framework for Node.js. Features:
 
 
 ## Usage
-Theatre uses ES6's WeakMap, so Node.js needs to be run with either the `--harmony_collections` or `--harmony` flag.
+To install, simply run `npm install theatre`.
 
-### `#resolve(classy)`
-  * `classy` is the class to instantiate and resolve dependencies for
-  
-Resolves the dependencies for a class and then instantiates the class. Returns a promise for an instance of the given class. If `classy` is a singleton class and has already been requested before, the promise for the previous request is returned.
+_Note:_ Theatre uses ES6's WeakMap, so any app using it needs Node.js to be run with either the `--harmony_collections` or `--harmony` flag.
 
 
-## Example
+### Defining a class
+Theatre works with regular Javascript classes. Class options (such as dependencies) are placed in the `__theatre` property. This means that classes can also be used without Theatre, and also that dependencies can include classes that weren't specifically designed for Theatre.
 
+#### `__theatre` options
+  * `single` - Boolean, default: `false` - Whether the class should only be instantiated once
+  * `inject` - Array, default: `[]` - List of dependencies, items are classes
+
+##### Example
 ```javascript
-// Logger
-function Logger() {}
+var Logger = require("./logger");
 
-Logger.prototype.log = function (message) {
-  console.log(message);
-};
+module.exports = Shouter;
 
-// Shouter
 Shouter.__theatre = {
-  inject: [ Logger ]
+  single: true, // The class is a singleton
+  inject: [
+    Logger // The class depends on the Logger class
+  ]
 };
 
 function Shouter(logger) {
@@ -38,13 +40,57 @@ function Shouter(logger) {
 }
 
 Shouter.prototype.log = function (message) {
-  this.logger.log(message.toUpperCase());
+  this.logger(message.toUpperCase());
 };
+```
 
-// Run
+
+### Resolving a class
+#### `Theatre#resolve(classy)`
+  * `classy` - Function - The class to instantiate
+  
+Resolves the dependencies for a class and then instantiates the class. Returns a promise for an instance of the given class. 
+
+If `classy` is a singleton and has already been requested, the promise for the previous request is returned.<br>
+
+##### Example
+```javascript
 var Theatre = require("theatre");
+var Shouter = require("./shouter");
+
 var app = new Theatre();
+
 app.resolve(Shouter).then(function (shouter) {
-  shouter.log("Hello world!"); // -> HELLO WORLD!
+  shouter.log("Hello, world!"); // -> HELLO, WORLD!
+});
+```
+
+
+### Overriding a class
+When a resolve request is made for an overridden class, the resolver uses the class with which it was overridden instead. This allows you easily mock dependencies during testing.
+
+#### `Theatre#addOverride(oldClass, newClass)`
+  * `oldClass` - Function - The class to override
+  * `newClass` - Function - The class to use instead
+
+Adds an override.
+
+#### `Theatre#removeOverride(oldClass)`
+  * `oldClass` - Function - The class for which to remove the override
+
+Removes an override.
+
+##### Example
+```javascript
+app.addOverride(Shouter, MockShouter);
+
+app.resolve(Shouter).then(function (shouter1) {
+  console.log(shouter1 instanceof MockShouter); // -> true
+  
+  app.removeOverride(Shouter);
+  
+  app.resolve(Shouter).then(function (shouter2) {
+    console.log(shouter2 instanceof Shouter); // -> true
+  });
 });
 ```
