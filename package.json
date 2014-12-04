@@ -1,0 +1,21 @@
+{
+  "name": "theatre",
+  "version": "0.0.1",
+  "main": "./theatre.js",
+  "description": "Small dependency injection framework with support for overriding of classes, asynchronous constructors using promises, singleton classes, and cycle detection.",
+  "keywords": [
+    "di",
+    "dependency injection"
+  ],
+  "license": "MIT",
+  "author": "Koen Klaren",
+  "dependencies": {
+    "q": "^1.1.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.0.1",
+    "chai": "^1.10.0",
+    "chai-spies": "^0.5.1",
+    "chai-as-promised": "^4.1.1"
+  }
+}
