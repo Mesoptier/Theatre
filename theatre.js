@@ -96,9 +96,11 @@ function detectCycle(classy, ancestors) {
   ancestors = ancestors.slice(0);
   ancestors.push(classy);
 
-  var dependencies = [];
-  if (classy.__theatre && classy.__theatre.inject)
-    dependencies = classy.__theatre.inject;
+  if (classy.__theatre && classy.__theatre.inject) {
+    var dependencies = classy.__theatre.inject;
+  } else {
+    return false;
+  }
 
   for (var i = 0; i < dependencies.length; i++) {
     if (detectCycle(dependencies[i], ancestors))
