@@ -90,4 +90,56 @@ describe("Theatre", function () {
     });
 
   });
+
+  describe("#addOverride()", function () {
+
+    it("should override a class", function () {
+      function Test1() {}
+      function Test2() {}
+
+      app.addOverride(Test1, Test2);
+
+      return app.resolve(Test1).then(function (test) {
+        expect(test).to.be.instanceof(Test2);
+      });
+    });
+
+  });
+
+  describe("#removeOverride()", function () {
+
+    it("should remove override for a class", function () {
+      function Test1() {}
+      function Test2() {}
+
+      app.addOverride(Test1, Test2);
+      app.removeOverride(Test1);
+
+      return app.resolve(Test1).then(function (test) {
+        expect(test).to.be.instanceof(Test1);
+      });
+    });
+
+  });
+
+  describe("#removeAllOverrides()", function () {
+
+    it("should remove all overrides", function () {
+      function Test1() {}
+      function Test2() {}
+      function Test3() {}
+
+      app.addOverride(Test1, Test3);
+      app.addOverride(Test2, Test3);
+      app.removeAllOverrides();
+
+      return expect(app.resolve(Test1))
+        .to.eventually.be.instanceof(Test1)
+        .then(function () {
+          return expect(app.resolve(Test2))
+            .to.eventually.be.instanceof(Test2);
+        });
+    });
+
+  });
 });
