@@ -93,6 +93,7 @@ app.resolve(Shouter).then(function (shouter1) {
   app.removeOverride(Shouter);
   
   app.resolve(Shouter).then(function (shouter2) {
+    console.log(shouter2 instanceof MockShouter); // -> false
     console.log(shouter2 instanceof Shouter); // -> true
   });
 });
