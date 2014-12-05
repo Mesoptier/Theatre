@@ -114,7 +114,7 @@ describe("Theatre", function () {
         function Test2() {}
 
         return app.resolve([Test1, Test2])
-          .spread(function (test1, test2) {
+          .then(function () {
             expect(app.resolve).to.have.been.called.with(Test1);
             expect(app.resolve).to.have.been.called.with(Test2);
           });
