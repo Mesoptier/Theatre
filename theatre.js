@@ -111,23 +111,20 @@ Theatre.prototype.removeAllOverrides = function () {
 Theatre.prototype._detectCycle = function (classy, ancestors) {
   if (typeof ancestors === "undefined")
     ancestors = [];
-
-  if (ancestors.indexOf(classy) != -1)
+  else if (ancestors.indexOf(classy) != -1)
     return true;
-
-  ancestors = ancestors.slice(0);
-  ancestors.push(classy);
 
   if (classy.__theatre && classy.__theatre.inject) {
     var dependencies = classy.__theatre.inject;
-  } else {
-    return false;
-  }
 
-  for (var i = 0; i < dependencies.length; i++) {
-    if (this._detectCycle(dependencies[i], ancestors))
-      return true;
+    ancestors = ancestors.slice(0);
+    ancestors.push(classy);
+
+    for (var i = 0; i < dependencies.length; i++) {
+      if (this._detectCycle(dependencies[i], ancestors))
+        return true;
+    }
   }
 
   return false;
-}
+};
