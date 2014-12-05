@@ -1,4 +1,5 @@
 var Q = require("q");
+var util = require("util");
 
 module.exports = Theatre;
 
@@ -8,15 +9,19 @@ function Theatre() {
 }
 
 /**
+ * Resolves the dependencies for a class and then instantiates the class.
  *
- * @param classy
- * @returns {Promise.<Object>}
+ * @param {Function|Array.<Function>} classy Class or array of classes to instantiate
+ * @returns {Promise.<Object>|Promise.<Array.<Object>>} Instance or array of instances
  */
 Theatre.prototype.resolve = function (classy) {
+  if (util.isArray(classy))
+    return this._resolveAll(classy);
+
   if (this._overrides.has(classy))
     classy = this._overrides.get(classy);
 
-  if (detectCycle(classy))
+  if (this._detectCycle(classy))
     return Q.reject(new Error("Class dependencies contain a cycle"));
 
   var singleton = false;
@@ -34,13 +39,8 @@ Theatre.prototype.resolve = function (classy) {
   if (singleton && this._instances.has(classy))
     return this._instances.get(classy);
 
-  // Create resolve-promises for the dependencies
-  dependencies = dependencies.map(function (dependency) {
-    return this.resolve(dependency);
-  }, this);
-
   // After the dependencies are resolved, instantiate the class
-  var instancePromise = Q.all(dependencies)
+  var instancePromise = this._resolveAll(dependencies)
     .then(function (resolved) {
       var tmpClass = function () {};
       tmpClass.prototype = classy.prototype;
@@ -49,9 +49,7 @@ Theatre.prototype.resolve = function (classy) {
       instance.constructor = classy;
 
       return Q(maybePromise)
-        .then(function () {
-          return instance;
-        });
+        .thenResolve(instance);
     });
 
   if (singleton)
@@ -61,10 +59,25 @@ Theatre.prototype.resolve = function (classy) {
 };
 
 /**
+ * Resolves an array of promises.
+ *
+ * @param {Array} classes Array of classes to resolve.
+ * @returns {Promise.<Array.<Object>>} Array of instances.
+ * @private
+ */
+Theatre.prototype._resolveAll = function (classes) {
+  classes = classes.map(function (classy) {
+    return this.resolve(classy);
+  }, this);
+
+  return Q.all(classes);
+};
+
+/**
  * Adds an override for a class.
  *
- * @param oldClass Class to be overridden.
- * @param newClass New class to override the old one with.
+ * @param {Function} oldClass Class to be overridden.
+ * @param {Function} newClass New class to override the old one with.
  */
 Theatre.prototype.addOverride = function (oldClass, newClass) {
   this._overrides.set(oldClass, newClass);
@@ -73,12 +86,15 @@ Theatre.prototype.addOverride = function (oldClass, newClass) {
 /**
  * Removes an override for a class.
  *
- * @param oldClass Overridden class to be returned to normal.
+ * @param {Function} oldClass Overridden class to be returned to normal.
  */
 Theatre.prototype.removeOverride = function (oldClass) {
   this._overrides.delete(oldClass);
 };
 
+/**
+ * Removes all overrides.
+ */
 Theatre.prototype.removeAllOverrides = function () {
   // Weakmap#clear() was removed, so we just create a new WeakMap
   this._overrides = new WeakMap();
@@ -90,8 +106,9 @@ Theatre.prototype.removeAllOverrides = function () {
  * @param {Function} classy Class to check the dependency list for.
  * @param {Array} [ancestors] Ancestors of the class.
  * @returns {boolean} Whether a cycle was detected.
+ * @private
  */
-function detectCycle(classy, ancestors) {
+Theatre.prototype._detectCycle = function (classy, ancestors) {
   if (typeof ancestors === "undefined")
     ancestors = [];
 
@@ -108,7 +125,7 @@ function detectCycle(classy, ancestors) {
   }
 
   for (var i = 0; i < dependencies.length; i++) {
-    if (detectCycle(dependencies[i], ancestors))
+    if (this._detectCycle(dependencies[i], ancestors))
       return true;
   }
 

@@ -37,6 +37,17 @@ describe("Theatre", function () {
         });
     });
 
+    it("should return a promise for an array of instances", function () {
+      function Test1() {}
+      function Test2() {}
+
+      return app.resolve([Test1, Test2])
+        .spread(function (test1, test2) {
+          expect(test1).to.be.instanceof(Test1);
+          expect(test2).to.be.instanceof(Test2);
+        });
+    });
+
     it("should resolve and inject dependencies", function () {
       var spy = chai.spy("constructor");
 
@@ -133,11 +144,10 @@ describe("Theatre", function () {
       app.addOverride(Test2, Test3);
       app.removeAllOverrides();
 
-      return expect(app.resolve(Test1))
-        .to.eventually.be.instanceof(Test1)
-        .then(function () {
-          return expect(app.resolve(Test2))
-            .to.eventually.be.instanceof(Test2);
+      return app.resolve([Test1, Test2])
+        .spread(function (test1, test2) {
+          expect(test1).to.be.instanceof(Test1);
+          expect(test2).to.be.instanceof(Test2);
         });
     });
 
