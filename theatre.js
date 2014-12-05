@@ -21,8 +21,9 @@ Theatre.prototype.resolve = function (classy) {
   if (this._overrides.has(classy))
     classy = this._overrides.get(classy);
 
-  if (this._detectCycle(classy))
-    return Q.reject(new Error("Class dependencies contain a cycle"));
+  var cyclePath = this._detectCycle(classy);
+  if (cyclePath !== false)
+    return Q.reject(this._createCycleDetectedError(cyclePath));
 
   var singleton = false;
   var dependencies = [];
@@ -105,14 +106,17 @@ Theatre.prototype.removeAllOverrides = function () {
  *
  * @param {Function} classy Class to check the dependency list for.
  * @param {Array} [ancestors] Ancestors of the class.
- * @returns {boolean} Whether a cycle was detected.
+ * @returns {boolean|Array.<Function>} The path if a cycle was found, otherwise false.
  * @private
  */
 Theatre.prototype._detectCycle = function (classy, ancestors) {
-  if (typeof ancestors === "undefined")
+  if (typeof ancestors === "undefined") {
     ancestors = [];
-  else if (ancestors.indexOf(classy) != -1)
-    return true;
+  } else if (ancestors.indexOf(classy) != -1) {
+    var path = ancestors.slice(ancestors.indexOf(classy));
+    path.push(classy);
+    return path;
+  }
 
   if (classy.__theatre && classy.__theatre.inject) {
     var dependencies = classy.__theatre.inject;
@@ -120,11 +124,20 @@ Theatre.prototype._detectCycle = function (classy, ancestors) {
     ancestors = ancestors.slice(0);
     ancestors.push(classy);
 
-    for (var i = 0; i < dependencies.length; i++) {
-      if (this._detectCycle(dependencies[i], ancestors))
-        return true;
+    for (var i = 0, result; i < dependencies.length; i++) {
+      result = this._detectCycle(dependencies[i], ancestors);
+      if (result !== false)
+        return result;
     }
   }
 
   return false;
+};
+
+Theatre.prototype._createCycleDetectedError = function (path) {
+  path = path.map(function (classy) {
+    return classy.name || "Anonymous";
+  }).join(" -> ");
+
+  return new Error("Cycle detected in class dependencies: " + path);
 };

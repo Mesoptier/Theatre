@@ -73,7 +73,7 @@ describe("Theatre", function () {
       Test1.__theatre = { inject: [Test1] };
 
       return expect(app.resolve(Test1))
-        .to.be.rejectedWith(Error, "Class dependencies contain a cycle");
+        .to.be.rejectedWith(Error, "Cycle detected in class dependencies: Test1 -> Test1");
     });
 
     it("should detect dependency cycles of length 2", function () {
@@ -84,7 +84,7 @@ describe("Theatre", function () {
       Test2.__theatre = { inject: [Test1] };
 
       return expect(app.resolve(Test1))
-        .to.be.rejectedWith(Error, "Class dependencies contain a cycle");
+        .to.be.rejectedWith(Error, "Cycle detected in class dependencies: Test1 -> Test2 -> Test1");
     });
 
     it("should detect dependency cycles of length 3", function () {
@@ -97,7 +97,7 @@ describe("Theatre", function () {
       Test3.__theatre = { inject: [Test1] };
 
       return expect(app.resolve(Test1))
-        .to.be.rejectedWith(Error, "Class dependencies contain a cycle");
+        .to.be.rejectedWith(Error, "Cycle detected in class dependencies: Test1 -> Test2 -> Test3 -> Test1");
     });
 
   });
