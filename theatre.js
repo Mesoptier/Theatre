@@ -110,6 +110,9 @@ Theatre.prototype.removeAllOverrides = function () {
  * @private
  */
 Theatre.prototype._detectCycle = function (classy, ancestors) {
+  if (this._overrides.has(classy))
+    classy = this._overrides.get(classy);
+
   if (typeof ancestors === "undefined") {
     ancestors = [];
   } else if (ancestors.indexOf(classy) != -1) {
