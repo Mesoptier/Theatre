@@ -1,11 +1,12 @@
 var Q = require("q");
 var util = require("util");
+var Map = require("es6-map");
 
 module.exports = Theatre;
 
 function Theatre() {
-  this._instances = new WeakMap();
-  this._overrides = new WeakMap();
+  this._instances = new Map();
+  this._overrides = new Map();
 }
 
 /**
@@ -97,8 +98,7 @@ Theatre.prototype.removeOverride = function (oldClass) {
  * Removes all overrides.
  */
 Theatre.prototype.removeAllOverrides = function () {
-  // Weakmap#clear() was removed, so we just create a new WeakMap
-  this._overrides = new WeakMap();
+  this._overrides.clear();
 };
 
 /**

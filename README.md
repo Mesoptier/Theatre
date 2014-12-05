@@ -12,8 +12,6 @@ Small dependency injection framework for Node.js. Features:
 ## Usage
 To install, simply run `npm install theatre`.
 
-_Note:_ Theatre uses ES6's WeakMap, so any app using it needs Node.js to be run with either the `--harmony_collections` or `--harmony` flag.
-
 
 ### Defining a class
 Theatre works with regular Javascript classes. Class options (such as dependencies) are placed in the `__theatre` property. This means that classes can also be used without using Theatre, and also that dependencies can include classes that weren't specifically designed for Theatre.

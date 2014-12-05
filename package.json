@@ -10,7 +10,8 @@
   "license": "MIT",
   "author": "Koen Klaren",
   "dependencies": {
-    "q": "^1.1.2"
+    "q": "^1.1.2",
+    "es6-map": "^0.1.1"
   },
   "devDependencies": {
     "mocha": "^2.0.1",
