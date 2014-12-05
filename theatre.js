@@ -137,6 +137,13 @@ Theatre.prototype._detectCycle = function (classy, ancestors) {
   return false;
 };
 
+/**
+ * Creates an error for detected cyclic dependencies.
+ *
+ * @param {Array.<Function>} path Path of dependencies that was detected as a cycle.
+ * @returns {Error}
+ * @private
+ */
 Theatre.prototype._createCycleDetectedError = function (path) {
   path = path.map(function (classy) {
     return classy.name || "Anonymous";
