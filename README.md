@@ -47,7 +47,7 @@ Shouter.prototype.log = function (message) {
 
 ### Resolving a class
 #### `Theatre#resolve(classy)`
-  * `classy` - Function - The class to instantiate
+  * `classy` - Function or Array.<Function> - Class or array of classes to instantiate
   
 Resolves the dependencies for a class and then instantiates the class. Returns a promise for an instance of the given class. 
 
@@ -70,15 +70,18 @@ app.resolve(Shouter).then(function (shouter) {
 When a resolve request is made for an overridden class, the resolver uses the class with which it was overridden instead. This allows you easily mock dependencies during testing.
 
 #### `Theatre#addOverride(oldClass, newClass)`
-  * `oldClass` - Function - The class to override
-  * `newClass` - Function - The class to use instead
+  * `oldClass` - Function - Class to be overridden.
+  * `newClass` - Function - New class to override the old one with.
 
 Adds an override.
 
 #### `Theatre#removeOverride(oldClass)`
-  * `oldClass` - Function - The class for which to remove the override
+  * `oldClass` - Function - Overridden class to be returned to normal.
 
 Removes an override.
+
+#### `Theatre#removeAllOverrides()`
+Removes all overrides.
 
 ##### Example
 ```javascript
