@@ -79,6 +79,11 @@ Theatre.prototype.removeOverride = function (oldClass) {
   this._overrides.delete(oldClass);
 };
 
+Theatre.prototype.removeAllOverrides = function () {
+  // Weakmap#clear() was removed, so we just create a new WeakMap
+  this._overrides = new WeakMap();
+};
+
 /**
  * Detects cycles in the dependencies of classes.
  *
