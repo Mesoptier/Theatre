@@ -36,7 +36,7 @@ Theatre.prototype.resolve = function (classy) {
       dependencies = classy.__theatre.inject;
   }
 
-  // If this class is a singleton and we already have an instance, return the instance
+  // If this class is a singleton and we already have a promise for an instance, return the promise
   if (singleton && this._instances.has(classy))
     return this._instances.get(classy);
 
