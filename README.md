@@ -16,11 +16,11 @@ _Note:_ Theatre uses ES6's WeakMap, so any app using it needs Node.js to be run 
 
 
 ### Defining a class
-Theatre works with regular Javascript classes. Class options (such as dependencies) are placed in the `__theatre` property. This means that classes can also be used without Theatre, and also that dependencies can include classes that weren't specifically designed for Theatre.
+Theatre works with regular Javascript classes. Class options (such as dependencies) are placed in the `__theatre` property. This means that classes can also be used without using Theatre, and also that dependencies can include classes that weren't specifically designed for Theatre.
 
 #### `__theatre` options
   * `single` - Boolean, default: `false` - Whether the class should only be instantiated once
-  * `inject` - Array, default: `[]` - List of dependencies, items are classes
+  * `inject` - Array.\<Function>, default: `[]` - List of dependencies
 
 ##### Example
 ```javascript
@@ -47,7 +47,7 @@ Shouter.prototype.log = function (message) {
 
 ### Resolving a class
 #### `Theatre#resolve(classy)`
-  * `classy` - Function or Array.<Function> - Class or array of classes to instantiate
+  * `classy` - Function or Array.\<Function> - Class or array of classes to instantiate
   
 Resolves the dependencies for a class and then instantiates the class. Returns a promise for an instance of the given class. 
 
@@ -97,4 +97,27 @@ app.resolve(Shouter).then(function (shouter1) {
     console.log(shouter2 instanceof Shouter); // -> true
   });
 });
+```
+
+## License (MIT)
+```
+Copyright (c) 2014 Koen Klaren
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
 ```
