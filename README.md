@@ -18,12 +18,15 @@ _Note:_ Theatre uses ES6's WeakMap, so any app using it needs Node.js to be run 
 ### Defining a class
 Theatre works with regular Javascript classes. Class options (such as dependencies) are placed in the `__theatre` property. This means that classes can also be used without using Theatre, and also that dependencies can include classes that weren't specifically designed for Theatre.
 
+If a constructor returns a promise, the resolver will wait for it to fulfill before finishing the instantiation. The value of the promise is ignored and dependants still receive the correct instance.
+
 #### `__theatre` options
   * `single` - Boolean, default: `false` - Whether the class should only be instantiated once
   * `inject` - Array.\<Function>, default: `[]` - List of dependencies
 
 ##### Example
 ```javascript
+var Q = require("q");
 var Logger = require("./logger");
 
 module.exports = Shouter;
@@ -37,6 +40,8 @@ Shouter.__theatre = {
 
 function Shouter(logger) {
   this.logger = logger;
+  
+  return Q.delay(500); // The resolver will wait for 500ms
 }
 
 Shouter.prototype.log = function (message) {
@@ -98,6 +103,7 @@ app.resolve(Shouter).then(function (shouter1) {
   });
 });
 ```
+
 
 ## License (MIT)
 ```
