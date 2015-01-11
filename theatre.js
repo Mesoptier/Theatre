@@ -1,4 +1,4 @@
-var Q = require("q");
+var Promise = require("bluebird");
 var util = require("util");
 var Map = require("es6-map");
 
@@ -24,7 +24,7 @@ Theatre.prototype.resolve = function (classy) {
 
   var cyclePath = this._detectCycle(classy);
   if (cyclePath !== false)
-    return Q.reject(this._createCycleDetectedError(cyclePath));
+    return Promise.reject(this._createCycleDetectedError(cyclePath));
 
   var singleton = false;
   var dependencies = [];
@@ -50,8 +50,9 @@ Theatre.prototype.resolve = function (classy) {
       var maybePromise = classy.apply(instance, resolved);
       instance.constructor = classy;
 
-      return Q(maybePromise)
-        .thenResolve(instance);
+      return Promise
+        .resolve(maybePromise)
+        .return(instance);
     });
 
   if (singleton)
@@ -72,7 +73,7 @@ Theatre.prototype._resolveAll = function (classes) {
     return this.resolve(classy);
   }, this);
 
-  return Q.all(classes);
+  return Promise.all(classes);
 };
 
 /**

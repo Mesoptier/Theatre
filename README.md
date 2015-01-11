@@ -24,7 +24,7 @@ If a constructor returns a promise, the resolver will wait for it to fulfill bef
 
 ##### Example
 ```javascript
-var Q = require("q");
+var Promise = require("bluebird");
 var Logger = require("./logger");
 
 module.exports = Shouter;
@@ -39,7 +39,7 @@ Shouter.__theatre = {
 function Shouter(logger) {
   this.logger = logger;
   
-  return Q.delay(500); // The resolver will wait for 500ms
+  return Promise.delay(500); // The resolver will wait for 500ms
 }
 
 Shouter.prototype.log = function (message) {
